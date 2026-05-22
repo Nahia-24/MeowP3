@@ -1,83 +1,39 @@
-# 🐱 MeowP3
+<div align="center">
+  <img src="public/icon.jpg" alt="MeowP3" width="100" style="border-radius: 20px"/>
+  
+  # MeowP3
+  
+  **Reproductor de música de escritorio con estética kawaii oscura**
+  
+  ![React](https://img.shields.io/badge/React-18-61dafb?style=flat-square&logo=react)
+  ![Electron](https://img.shields.io/badge/Electron-28-47848f?style=flat-square&logo=electron)
+  ![Node](https://img.shields.io/badge/Node.js-Express-339933?style=flat-square&logo=node.js)
+  ![License](https://img.shields.io/badge/Música-CC%20%2F%20Libre-ff6eb4?style=flat-square)
+</div>
 
-Reproductor de música local con estética cute oscura, construido con **React**.
+---
 
 ## ✨ Características
 
 - ▶️ Play / Pause
-- ⏭️ Siguiente / ⏮️ Anterior
+- ⏭️ Siguiente / ⏮️ Anterior  
 - 🔁 Modo repetir
 - 🔀 Modo aleatorio
 - 📋 Lista de canciones
 - 🔊 Control de volumen
 - 🎵 Barra de progreso interactiva
-- 🌙 Tema oscuro con estética kawaii
+- 🌙 Tema oscuro kawaii — sin fondo, flota sobre el escritorio
+- 🐱 Se detectan automáticamente los `.mp3` de la carpeta `music/`
 
-## 🎵 Canciones incluidas (dominio público)
+## 🛠️ Stack
 
-Las canciones base son piezas clásicas cuyo copyright ha expirado:
-
-| Canción | Compositor |
-|---------|-----------|
-| Gymnopedie No. 1 | Erik Satie |
-| Moonlight Sonata (1st Mov.) | Ludwig van Beethoven |
-| Clair de Lune | Claude Debussy |
-| Nocturne Op. 9 No. 2 | Frédéric Chopin |
-
-Fuente: Wikimedia Commons (CC / Dominio Público)
-
-## 🚀 Inicio rápido
-
-```bash
-npm install
-npm start
-```
-
-Abre [http://localhost:3000](http://localhost:3000) en tu navegador.
-
-## 📦 Empaquetar como app de escritorio (Electron)
-
-```bash
-npm install --save-dev electron electron-builder concurrently wait-on cross-env
-```
-
-Agrega a `package.json`:
-```json
-{
-  "main": "public/electron.js",
-  "homepage": "./",
-  "scripts": {
-    "electron-dev": "concurrently \"cross-env BROWSER=none npm start\" \"wait-on http://localhost:3000 && electron .\"",
-    "electron-build": "npm run build && electron-builder"
-  }
-}
-```
-
-## ☁️ Conectar tu BD en la nube (uso personal)
-
-Para usar tus propias canciones sin subirlas al repositorio público:
-
-1. Crea una base de datos en **Firebase** o **Supabase**
-2. Sube tus archivos de audio a **Firebase Storage** o **Cloudinary**
-3. Crea un archivo `.env.local` (está en `.gitignore`):
-
-```env
-REACT_APP_FIREBASE_API_KEY=tu_api_key
-REACT_APP_FIREBASE_STORAGE_BUCKET=tu_bucket
-```
-
-4. En `App.jsx`, reemplaza `BASE_SONGS` con una llamada a tu BD:
-
-```js
-useEffect(() => {
-  fetch(`${process.env.REACT_APP_API_URL}/songs`)
-    .then(r => r.json())
-    .then(data => setSongs(data));
-}, []);
-```
-
-> ⚠️ **Importante:** El archivo `.env.local` nunca se sube a GitHub.
-> Tu música personal permanece privada; el repositorio solo contiene las canciones de dominio público.
+| Tecnología | Uso |
+|-----------|-----|
+| React 18 | Interfaz de usuario |
+| Electron 28 | App de escritorio (sin navegador) |
+| Node.js + Express | Servidor local que lee la carpeta de música |
+| HTML5 Audio API | Reproducción de audio |
+| CSS Variables | Theming kawaii oscuro |
 
 ## 📁 Estructura del proyecto
 
@@ -93,13 +49,39 @@ kawaii-player/
 └── README.md
 ```
 
-## 🛠️ Stack
+## 🚀 Correr en desarrollo
 
-- **React 18** — UI
-- **CSS Variables** — Theming
-- **HTML5 Audio API** — Reproducción
-- **(Opcional) Electron** — App de escritorio
+**Terminal 1 — servidor de música:**
+```bash
+node server.js
+```
+
+**Terminal 2 — app Electron:**
+```bash
+npm run electron-dev
+```
+
+> La app se abre como ventana flotante sin fondo, sin navegador.
+
+## 🎵 Canciones incluidas
+
+Música libre de derechos de autor de [Pixabay](https://pixabay.com/music/):
+
+| Canción | Artista |
+|---------|---------|
+| Pink Candy | AI Seven |
+| Gummy Drive | Mvno |
+| Kawaii Pop Sparkle | Nala Subrada |
+| Kawaii Drops | Poorkid Music |
+
+## ☁️ Agregar tu propia música
+
+Solo arrastra tus archivos `.mp3` a la carpeta `public/music/` — el reproductor los detecta automáticamente sin tocar ningún archivo de código.
+
+Para conectar una base de datos en la nube (uso personal privado), crea un `.env.local` con tus credenciales de Firebase o Supabase. Este archivo está en `.gitignore` y nunca se sube al repositorio.
 
 ---
 
-*Made with 🖤 and ≽^•⩊•^≼*
+<div align="center">
+  <i>Made with 🖤 and ≽^•⩊•^≼</i>
+</div>
