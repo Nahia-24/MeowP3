@@ -65,6 +65,12 @@ const Icons = {
       <line x1="6" y1="6" x2="18" y2="18" />
     </svg>
   ),
+  Add: () => (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="16" height="16">
+      <line x1="12" y1="5" x2="12" y2="19" />
+      <line x1="5" y1="12" x2="19" y2="12" />
+    </svg>
+  ),
 };
 
 export default function App() {
@@ -131,7 +137,7 @@ export default function App() {
   const togglePlay = () => {
     const audio = audioRef.current;
     if (isPlaying) { audio.pause(); setIsPlaying(false); }
-    else audio.play().then(() => setIsPlaying(true)).catch(() => {});
+    else audio.play().then(() => setIsPlaying(true)).catch(() => { });
   };
 
   const handleNext = useCallback(() => {
@@ -170,6 +176,23 @@ export default function App() {
       </div>
     </div>
   );
+
+  const handleAddSongs = async () => {
+    if (!window.electronAPI) return;
+    const filePaths = await window.electronAPI.openFiles();
+    if (!filePaths || filePaths.length === 0) return;
+    const newSongs = filePaths.map((filePath, i) => {
+      const fileName = filePath.split('\\').pop().split('/').pop();
+      return {
+        id: Date.now() + i,
+        title: fileName.replace('.mp3', '').replace('.wav', '').replace('.ogg', '').replace(/-/g, ' ').replace(/_/g, ' '),
+        artist: 'Local',
+        src: `file://${filePath}`,
+        filePath: filePath,
+      };
+    });
+    setSongs(prev => [...prev, ...newSongs]);
+  };
 
   return (
     <div className="app-bg">
@@ -243,30 +266,45 @@ export default function App() {
           <button className="ctrl-btn sm" onClick={() => setShowList(!showList)} title="Lista">
             <Icons.List />
           </button>
+          <button className="ctrl-btn sm add-btn" onClick={handleAddSongs} title="Agregar música">
+            <Icons.Add />
+          </button>
         </div>
-      </div>
 
-      {showList && (
-        <div className="song-list-panel">
-          <div className="list-header">
-            <span>𝅗𝅥 Lista de canciones</span>
-            <button className="ctrl-btn sm" onClick={() => setShowList(false)}><Icons.Close /></button>
+        {showList && (
+          <div className="song-list-panel">
+            <div className="list-header">
+              <span>𝅗𝅥 Lista de canciones</span>
+              <button className="ctrl-btn sm" onClick={() => setShowList(false)}><Icons.Close /></button>
+            </div>
+            <ul className="song-list">
+              {songs.map((song, idx) => (
+                <li key={song.id} className={`song-item ${idx === currentIdx ? "song-active" : ""}`}
+                  onClick={() => { setCurrentIdx(idx); setIsPlaying(true); setTimeout(() => audioRef.current?.play(), 100); setShowList(false); }}>
+                  <span className="song-item-num">{idx === currentIdx && isPlaying ? "♪" : idx + 1}</span>
+                  <div className="song-item-info">
+                    <span className="song-item-title">{song.title}</span>
+                    <span className="song-item-artist">{song.artist}</span>
+                  </div>
+                  {idx === currentIdx && <span className="song-item-dot" />}
+                  <button className="delete-btn" title="Eliminar"
+                    onClick={async (e) => {
+                      e.stopPropagation();
+                      if (song.filePath && window.electronAPI) {
+                        await window.electronAPI.deleteSong(song.filePath);
+                      }
+                      const newSongs = songs.filter(s => s.id !== song.id);
+                      setSongs(newSongs);
+                      if (currentIdx >= newSongs.length) setCurrentIdx(Math.max(0, newSongs.length - 1));
+                    }}>
+                    <Icons.Close />
+                  </button>
+                </li>
+              ))}
+            </ul>
           </div>
-          <ul className="song-list">
-            {songs.map((song, idx) => (
-              <li key={song.id} className={`song-item ${idx === currentIdx ? "song-active" : ""}`}
-                onClick={() => { setCurrentIdx(idx); setIsPlaying(true); setTimeout(() => audioRef.current?.play(), 100); setShowList(false); }}>
-                <span className="song-item-num">{idx === currentIdx && isPlaying ? "♪" : idx + 1}</span>
-                <div className="song-item-info">
-                  <span className="song-item-title">{song.title}</span>
-                  <span className="song-item-artist">{song.artist}</span>
-                </div>
-                {idx === currentIdx && <span className="song-item-dot" />}
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 }
